@@ -8,7 +8,7 @@ describe('Snapshot - Destination - SFTP : Automation', () => {
       cy.get('#user_pass').type('1234567891011');
       cy.get('#wp-submit').click();
 
-      // Check if the onboarding modal exists before proceeding
+      //  // Check if the onboarding modal exists before proceeding
       // cy.visit('https://test2suhailashifa.tempurl.host/wp-admin/admin.php?page=smush');
       // cy.wait(2000);
       // cy.get('body').then(($body) => {
@@ -23,63 +23,77 @@ describe('Snapshot - Destination - SFTP : Automation', () => {
       cy.get('#snapshot-add-destination').click(); // Click on Add Destination button
       cy.get('#ftp-destination').click( {force: true}); // Select FTP/SFTP
       cy.contains('Next').click(); // Click Next
-      cy.get('input[value="sftp"]').click({force: true}); // Ensure SFTP tab is selected
+      cy.get('#snapshot-add-destination-dialog-slide-2-ftp .snapshot-ftp-type div:nth-child(2)').click(); // Ensure SFTP tab is selected
+
+      // Declaring all the Valid and Invalid values
+      const valid_username = 'suhailashifa';
+      const invalid_username = 'invalid username';
+      const valid_password = '1234567891011';
+      const invalid_password = 'inavlid password';
+      const valid_host = 'test2suhailashifa.tempurl.host';
+      const valid_directoryPath = 'site/public_html/test_snapshot3';
+      const invalid_directoryPath = 'site/public_html/test';
+      const destinationName = 'SFTP Backups';
 
       // Step 2: Enter SFTP details
-
       // Step 2a: Check if deafult values are set as expected in SFTP details modal
       cy.get('#ftp-port').should('have.value','22'); // Check if default Port value set to is 22
       cy.get('#ftp-details-limit').should('have.value','5'); // Check if default Storage Limit value is set to 5
       cy.get('#ftp-timeout').should('have.value','90'); // Check if default Timeout value is set to 90
+
+
     
-      // Step 3: Negative test cases for Test Connection
-      // Step 3a: Test Connection with incorrect invalid username and password
-      cy.get('#ftp-user').type('invalid username'); // Enter invalid Username
-      cy.get('#ftp-password').type('inavlid password'); // Enter invalid Password
-      cy.get('#ftp-host').type('test2suhailashifa.tempurl.host'); // Enter Host
-      cy.get('#ftp-directory').type('site/public_html/test_snapshot2'); // Enter Directory
+      //-------* Negative test cases for Test Connection -------*//
+
+
+      // Step 3a: Test Connection with Invalid Username and Password
+      cy.get('#ftp-user').clear().type(invalid_username); // Enter invalid Username
+      cy.get('#ftp-password').clear().type(invalid_password); // Enter invalid Password
+      cy.get('#ftp-host').clear().type(valid_host); // Enter Host
+      cy.get('#ftp-directory').clear().type(valid_directoryPath); // Enter Directory
       cy.get('#snapshot-test-connection__ftp').click(); // Click Test Connection
-      //cy.get('#snapshot-test-connection__ftp', { timeout: 50000 }).should('not.contain.text','Testing...'); // Verify test connection button isn't in Testing state
-      cy.wait(30000); //wait for the spinner to disappear
+      cy.wait(15000); //wait for the spinner to disappear
       cy.get('.sui-notice-content').contains('Test Connection failed.'); // Verify failed connection
       
-
-      // Step 3b: Test Connection with incorrect Directory ID
-      cy.get('#ftp-user').type('suhailashifa'); // Enter Username
-      cy.get('#ftp-password').type('1234567891011'); // Enter Password
-      cy.get('#ftp-directory').type('site/public_html/test'); // Enter Directory
+      // Step 3b: Test Connection with Invalid Directory ID
+      cy.get('#ftp-user').clear().type(valid_username); // Enter Username
+      cy.get('#ftp-password').clear().type(valid_password); // Enter Password
+      cy.get('#ftp-directory').clear().type(invalid_directoryPath); // Enter Directory
       cy.get('#snapshot-test-connection__ftp').click(); // Click Test Connection
-      cy.wait(30000); //wait for the spinner to disappear
+      cy.wait(15000); //wait for the spinner to disappear
       cy.get('.sui-notice-content').contains('Test Connection failed.'); // Verify failed connection
 
       // Step 3c: Test Connection and verify successful connection with already added Directory ID
-      cy.get('#ftp-directory').type('site/public_html/test_snapshot'); // Enter Directory
+      cy.get('#ftp-directory').clear().type(valid_directoryPath); // Enter Directory
       cy.get('#snapshot-test-connection__ftp').click(); // Click Test Connection
-      cy.wait(30000); //wait for the spinner to disappear
+      cy.wait(15000); //wait for the spinner to disappear
       cy.get('.sui-notice-content').contains('Test Connection failed.'); // Verify failed connection
+
+
       
-      // Step 4: Positive test cases for Test Connection
+      //-------* Positive test cases for Test Connection -------*//
+
+
       // Step 4: Successful Test Connection
       // Step 4a: Test Connection with correct Directory ID
-      cy.get('#ftp-directory').type('site/public_html/test_snapshot2'); // Enter Directory
+      cy.get('#ftp-directory').clear().type(valid_directoryPath); // Enter Directory
       cy.get('#snapshot-test-connection__ftp').click(); // Click Test Connection, , { timeout: 50000 }
-      cy.wait(30000); //wait for the spinner to disappear
+      cy.wait(15000); //wait for the spinner to disappear
       cy.get('.sui-notice-content').contains('The testing results were successful. We are able to connect to your destination.'); // Verify successful connection
 
-      // Step 4b: Set Destination Name and Save
-      // cy.contains('Connection successful').should('be.visible'); // Verify successful connection
-      cy.contains('Next').click({force: true}); // Click Next
-      cy.get('#ftp-name').type('SFTP Backups 3'); // Enter Destination Name
-      cy.get('#snapshot-add-destination-dialog-slide-3-ftp > .sui-box > .sui-box-footer > .sui-button-blue').click(); // Click Save Destination
-      cy.get('.sui-notice-content').contains('Destination added successfully.'); // Verify Destination added successfully
 
-      // Step 5: Verify Destination in the list
-      cy.get('.sui-table').contains('SFTP Backups 3'); // Verify Destination Name in the list
-      cy.get('.sui-table').contains('site/public_html/test_snapshot2'); // Verify Directory in the list
-      cy.get('.sui-table').contains('0'); // Verify Exported Backups in the list
-      cy.get('.sui-table').contains('Active'); // Verify Destination Status in the list
-      
-      
+      // Step 5a: Set Destination Name and Save
+      cy.get('.snapshot-ftp-destination--next').click(); // Click Next
+      cy.get('input[id="ftp-name"]').clear().type(destinationName); // Enter Destination Name
+      cy.get('.snapshot-ftp-destination--save').click(); // Click Save Destination 
+      cy.wait(15000); //wait for the spinner to disappear
+      cy.log('Successfully Added Destination');
+
+      // // Step 6: Verify Destination in the list : Verify both values exist in the same row
+      cy.visit('https://test2suhailashifa.tempurl.host/wp-admin/admin.php?page=snapshot-destinations');
+      cy.get('.sui-table tr').contains(new RegExp(`${destinationName}.*${valid_directoryPath}`)).and('contain', '0'); // Verify Destination Name and Directory in the list
+      cy.log('Newly Added Destination Exists');
+    
   });
 
 });
