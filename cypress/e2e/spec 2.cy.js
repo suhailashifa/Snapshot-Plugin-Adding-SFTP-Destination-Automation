@@ -50,7 +50,6 @@ describe('Snapshot - Destination - SFTP : Automation', () => {
         //-------* Negative test case 3c for Test Connection -------*//
   
         // Step 3c: Test Connection and verify successful connection with already added Directory ID
-        cy.get('#ftp-directory').clear().type(valid_directoryPath); // Enter Directory
         cy.get('#snapshot-test-connection__ftp').click(); // Click Test Connection
         cy.get('#snapshot-duplicate-ftp-details__test .sui-notice-content', { timeout: 15000 }).should('be.visible')
           .and('contain', `You're trying to save a destination that already exists. If you want to create a new destination with the same credentials, please choose a different folder or create a new one. If you run into further issues, you can contact our Support team for help.`);
