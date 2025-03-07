@@ -52,22 +52,25 @@ describe('Snapshot - Destination - SFTP : Automation', () => {
       cy.get('#ftp-host').clear().type(valid_host); // Enter Host
       cy.get('#ftp-directory').clear().type(valid_directoryPath); // Enter Directory
       cy.get('#snapshot-test-connection__ftp').click(); // Click Test Connection
-      cy.wait(15000); //wait for the spinner to disappear
-      cy.get('.sui-notice-content').contains('Test Connection failed.'); // Verify failed connection
+      cy.get('span.sui-button-text-onload').contains('Testing...', { force: true }).should('not.be.visible'); // Verify loading button text is not visible
+      cy.get('.sui-notice-content').contains('Test Connection failed.', { force: true }).should('be.visible'); // Verify failed connection
+      
       
       // Step 3b: Test Connection with Invalid Directory ID
       cy.get('#ftp-user').clear().type(valid_username); // Enter Username
       cy.get('#ftp-password').clear().type(valid_password); // Enter Password
       cy.get('#ftp-directory').clear().type(invalid_directoryPath); // Enter Directory
       cy.get('#snapshot-test-connection__ftp').click(); // Click Test Connection
-      cy.wait(15000); //wait for the spinner to disappear
-      cy.get('.sui-notice-content').contains('Test Connection failed.'); // Verify failed connection
+      cy.get('span.sui-button-text-onload').contains('Testing...', { force: true }).should('not.be.visible'); // Verify loading button text is not visible
+      cy.get('.sui-notice-content').contains('Test Connection failed.', { force: true }).should('be.visible'); // Verify failed connection
+      
 
       // Step 3c: Test Connection and verify successful connection with already added Directory ID
       cy.get('#ftp-directory').clear().type(valid_directoryPath); // Enter Directory
       cy.get('#snapshot-test-connection__ftp').click(); // Click Test Connection
-      cy.wait(15000); //wait for the spinner to disappear
-      cy.get('.sui-notice-content').contains('Test Connection failed.'); // Verify failed connection
+      cy.get('span.sui-button-text-onload').contains('Testing...', { force: true }).should('not.be.visible'); // Verify loading button text is not visible
+      cy.get('.sui-notice-content').contains('Test Connection failed.', { force: true }).should('be.visible'); // Verify failed connection
+      
 
 
       
@@ -77,22 +80,39 @@ describe('Snapshot - Destination - SFTP : Automation', () => {
       // Step 4: Successful Test Connection
       // Step 4a: Test Connection with correct Directory ID
       cy.get('#ftp-directory').clear().type(valid_directoryPath); // Enter Directory
-      cy.get('#snapshot-test-connection__ftp').click(); // Click Test Connection, , { timeout: 50000 }
-      cy.wait(15000); //wait for the spinner to disappear
-      cy.get('.sui-notice-content').contains('The testing results were successful. We are able to connect to your destination.'); // Verify successful connection
+      cy.get('#snapshot-test-connection__ftp').click(); // Click Test Connection
+      cy.get('span.sui-button-text-onload').contains('Testing...', { force: true }).should('not.be.visible'); // Verify loading button text is not visible
+      cy.get('.sui-notice-content p').contains('The testing results were successful. We are able to connect to your destination.', { force: true }).should('be.visible'); // Verify successful connection
 
+      // Step 5: Set Destination Name and Save
+      //cy.get('.snapshot-ftp-destination--next').contains('Next').invoke('click'); // Click Next {force: true}
+      cy.get('.snapshot-ftp-destination--next').contains('Next').click({force: true}); // Click Next
+      cy.get('input[id="ftp-name"]', { timeout: 5000 }).clear({ force: true }).type(destinationName, { force: true }); // Enter Destination Name
+      //cy.get('#ftp-name').should('be.visible').clear({ force: true }).type(destinationName, { force: true }); // Type destinationName
+      cy.get('.snapshot-ftp-destination--save').click(); // Click Save Destination
+      cy.get('span.sui-button-text-onload').contains('Loading...', { force: true }).should('not.be.visible'); // Verify spinner is not visible 
+      cy.get('.sui-notice-content p').contains(destinationName + ' has been added as a destination.', { force: true }).should('exist'); // Verify successful addition
+      
 
-      // Step 5a: Set Destination Name and Save
-      cy.get('.snapshot-ftp-destination--next').click(); // Click Next
-      cy.get('input[id="ftp-name"]').clear().type(destinationName); // Enter Destination Name
-      cy.get('.snapshot-ftp-destination--save').click(); // Click Save Destination 
-      cy.wait(15000); //wait for the spinner to disappear
-      cy.log('Successfully Added Destination');
-
-      // // Step 6: Verify Destination in the list : Verify both values exist in the same row
+      // Step 6: Verify Destination in the list : Verify both values exist in the same row
       cy.visit('https://test2suhailashifa.tempurl.host/wp-admin/admin.php?page=snapshot-destinations');
-      cy.get('.sui-table tr').contains(new RegExp(`${destinationName}.*${valid_directoryPath}`)).and('contain', '0'); // Verify Destination Name and Directory in the list
-      cy.log('Newly Added Destination Exists');
+      cy.get('.sui-table tr')
+          .contains(destinationName, { force: true }) // Find the row containing destinationName
+          .closest('tr')
+          .within(() => {
+              // Look for Directory Path
+              cy.get('.snapshot-destination-path')
+              .parent() // Move to the parent div (where data-tpd_path exists)
+              .invoke('attr', 'data-tpd_path')
+              .should('eq', valid_directoryPath);
+
+              // // Look for Backup Count
+              cy.get('.backup-count')
+              .parent() // Move to the parent div (where data-tpd_path exists)
+              .invoke('attr', 'data-ftp-passive-mode')
+              .should('eq', '0');
+          });
+      
     
   });
 
