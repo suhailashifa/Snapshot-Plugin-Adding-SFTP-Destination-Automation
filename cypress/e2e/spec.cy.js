@@ -91,7 +91,7 @@ describe('Snapshot - Destination - SFTP : Automation', () => {
       //cy.get('#ftp-name').should('be.visible').clear({ force: true }).type(destinationName, { force: true }); // Type destinationName
       cy.get('.snapshot-ftp-destination--save').click(); // Click Save Destination
       cy.get('span.sui-button-text-onload').contains('Loading...', { force: true }).should('not.be.visible'); // Verify spinner is not visible 
-      cy.get('.sui-notice-content p').contains(destinationName + ' has been added as a destination.', { force: true }).should('exist'); // Verify successful addition
+      cy.get('.sui-notice-content p').contains(destinationName + ' has been added as a destination.', { force: true }).should('be.visible'); // Verify successful addition
       
 
       // Step 6: Verify Destination in the list : Verify both values exist in the same row

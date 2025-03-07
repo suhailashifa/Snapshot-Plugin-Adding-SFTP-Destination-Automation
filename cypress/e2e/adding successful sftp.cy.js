@@ -42,14 +42,11 @@ describe('Snapshot - Destination - SFTP : Automation', () => {
   
         // Step 3: Set Destination Name and Save
         cy.get('.snapshot-ftp-destination--next').contains('Next').invoke('click'); // Click Next
-        //cy.get('[data-slide-to="snapshot-add-destination-dialog-slide-3-ftp"]').invoke('click'); // Invoke the click method on the button
         cy.get('input[id="ftp-name"]', { timeout: 5000 }).clear().type(destinationName); // Enter Destination Name
-        //cy.get('#snapshot-add-destination-dialog-slide-3-ftp').should('exists'); // Ensure the modal is visible
         //cy.get('#ftp-name').clear().type(destinationName); // Type destinationName
         cy.get('.snapshot-ftp-destination--save').click(); // Click Save Destination
         cy.get('span.sui-button-text-onload').contains('Loading...', { force: true }).should('not.be.visible'); // Verify spinner is not visible 
-        cy.get('.sui-notice-content p').contains(destinationName + ' has been added as a destination.', { force: true }).should('exist'); // Verify successful addition
-        cy.get('.sui-icon-loader .sui-loading .snapshot-loading-schedule', { force: true }).should('not.be.visible'); // Verify spinner is not visible
+        cy.get('.sui-notice-content p').contains(destinationName + ' has been added as a destination.', { force: true }).should('be.visible'); // Verify successful addition
         
   
         // Step 4: Verify Destination in the list : Verify both values exist in the same row
