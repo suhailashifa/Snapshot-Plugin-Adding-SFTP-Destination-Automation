@@ -32,13 +32,13 @@ describe('Snapshot - Destination - SFTP : Automation', () => {
         cy.visit('https://test2suhailashifa.tempurl.host/wp-admin/admin.php?page=snapshot-destinations');
         //cy.wait(5000);
 
-        cy.get('td.sui-hidden-xs.sui-hidden-sm.snapshot-destination-path') // when exists: tr.destination-row.destination-type-ftp , when not exists: table.sui-table.sui-table-flushed,  td.snapshot-destination-path 
+        cy.get('tr.destination-row.destination-type-ftp') // when exists: tr.destination-row.destination-type-ftp , when not exists: table.sui-table.sui-table-flushed
         .invoke('attr', 'data-tpd_path')
         .then((path) => {
-            cy.log('path data type:', typeof path); // Log the type of 'path'
-            cy.log('valid_directoryPath data type:', typeof valid_directoryPath); // Log the type of 'valid_directoryPath'
-            cy.log('path value:', path); // Log the actual value of 'path'
-            cy.log('valid_directoryPath value:', valid_directoryPath); // Log the value of 'valid_directoryPath'
+            // cy.log('path data type:', typeof path); // Log the type of 'path'
+            // cy.log('valid_directoryPath data type:', typeof valid_directoryPath); // Log the type of 'valid_directoryPath'
+            // cy.log('path value:', path); // Log the actual value of 'path'
+            // cy.log('valid_directoryPath value:', valid_directoryPath); // Log the value of 'valid_directoryPath'
             if (path === valid_directoryPath) {
                 cy.log(`Path "${path}" already exists.`);
             } 
@@ -63,7 +63,7 @@ describe('Snapshot - Destination - SFTP : Automation', () => {
                 // Test Connection
                 cy.get('#snapshot-test-connection__ftp').click();
                 cy.get('#ftp-destination-test__success .sui-notice-content', { timeout: 15000 }).should('be.visible')
-                    .and('contain', `The testing results were successful. We are able to connect to your destination. You're good to proceed with the current settings. Click "Next" to continue.`);// Verify successful connection
+                .and('contain', `The testing results were successful. We are able to connect to your destination. You're good to proceed with the current settings. Click "Next" to continue.`);// Verify successful connection
 
                 // Set Destination Name and Save
                 cy.get('.snapshot-ftp-destination--next').contains('Next').click({ force: true });
@@ -71,7 +71,7 @@ describe('Snapshot - Destination - SFTP : Automation', () => {
                 cy.get('.snapshot-ftp-destination--save').click();
 
                 cy.get('.sui-floating-notices .sui-notice-content', { timeout: 15000 }).should('be.visible')
-                    .and('contain', `${destinationName} has been added as a destination.`);
+                .and('contain', `${destinationName} has been added as a destination.`);
             }
         });
         
